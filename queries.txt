@@ -1,0 +1,123 @@
+CREATE DATABASE SchoolDB;
+USE SchoolDB;
+
+
+CREATE TABLE Students (
+    StudentID INT AUTO_INCREMENT PRIMARY KEY,
+    FirstName VARCHAR(50),
+    LastName VARCHAR(50),
+    Age INT,
+    Grade VARCHAR(10)
+);
+
+CREATE TABLE Courses (
+    CourseID INT AUTO_INCREMENT PRIMARY KEY,
+    CourseName VARCHAR(100),
+    Instructor VARCHAR(100)
+);
+
+CREATE TABLE Enrollments (
+    EnrollmentID INT AUTO_INCREMENT PRIMARY KEY,
+    StudentID INT,
+    CourseID INT,
+    FOREIGN KEY (StudentID) REFERENCES Students(StudentID),
+    FOREIGN KEY (CourseID) REFERENCES Courses(CourseID)
+);
+
+
+INSERT INTO Students (FirstName, LastName, Age, Grade) VALUES
+('John', 'Doe', 15, '9'),
+('Jane', 'Smith', 16, '10'),
+('Alice', 'Brown', 14, '8');
+
+INSERT INTO Courses (CourseName, Instructor) VALUES
+('Math', 'Mr. Anderson'),
+('Science', 'Ms. Johnson'),
+('History', 'Mrs. Clark');
+
+INSERT INTO Enrollments (StudentID, CourseID) VALUES
+(1, 1),
+(1, 2),
+(2, 3),
+(3, 1);
+
+SELECT * FROM Students;
+
+SELECT 
+    s.FirstName, 
+    s.LastName, 
+    c.CourseName 
+FROM 
+    Enrollments e
+JOIN Students s ON e.StudentID = s.StudentID
+JOIN Courses c ON e.CourseID = c.CourseID;
+
+SELECT * FROM Students WHERE Grade = '10';
+
+
+SELECT 
+    c.CourseName, 
+    COUNT(e.StudentID) AS TotalStudents 
+FROM 
+    Enrollments e
+JOIN Courses c ON e.CourseID = c.CourseID
+GROUP BY c.CourseName;
+
+-- Update a student's grade
+UPDATE Students
+SET Grade = '10'
+WHERE FirstName = 'Alice' AND LastName = 'Brown';
+
+-- Delete a student by ID
+DELETE FROM Students
+WHERE StudentID = 3;
+
+-- Find students with last name starting with 'S'
+SELECT * FROM Students
+WHERE LastName LIKE 'S%';
+
+-- Find students in grades 9 or 10
+SELECT * FROM Students
+WHERE Grade IN ('9', '10');
+
+-- List students by age in descending order
+SELECT * FROM Students
+ORDER BY Age DESC;
+
+-- Get top 2 youngest students
+SELECT * FROM Students
+ORDER BY Age ASC
+LIMIT 2;
+
+-- Count total students
+SELECT COUNT(*) AS TotalStudents FROM Students;
+
+-- Find average age
+SELECT AVG(Age) AS AverageAge FROM Students;
+
+-- Maximum and Minimum age
+SELECT MAX(Age) AS Oldest, MIN(Age) AS Youngest FROM Students;
+
+-- Number of students in each grade
+SELECT Grade, COUNT(*) AS StudentCount
+FROM Students
+GROUP BY Grade;
+
+-- Only grades with more than 1 student
+SELECT Grade, COUNT(*) AS StudentCount
+FROM Students
+GROUP BY Grade
+HAVING COUNT(*) > 1;
+
+-- INNER JOIN: Only matching enrollments
+SELECT s.FirstName, c.CourseName
+FROM Students s
+INNER JOIN Enrollments e ON s.StudentID = e.StudentID
+INNER JOIN Courses c ON e.CourseID = c.CourseID;
+
+-- LEFT JOIN: All students, even if not enrolled
+SELECT s.FirstName, c.CourseName
+FROM Students s
+LEFT JOIN Enrollments e ON s.StudentID = e.StudentID
+LEFT JOIN Courses c ON e.CourseID = c.CourseID;
+
